@@ -18,7 +18,7 @@ uint8_t bank_set_16k(uint8_t mmu, uint8_t page)
 	return old_page >> 1;
 }
 
-void bank_set_esx()
+void bank_set_esx(void)
 {
 	ZXN_WRITE_MMU0(255);
 	ZXN_WRITE_MMU1(255);

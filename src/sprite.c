@@ -99,7 +99,7 @@ void sprite_set_color(uint16_t color, uint8_t palette_index)
 	sprite_set_palette(&color, 1, palette_index);
 }
 
-void sprites_clear()
+void sprites_clear(void)
 {
 	ZXN_NEXTREG(REG_SPRITE_SELECT, 0);
 	
@@ -109,7 +109,7 @@ void sprites_clear()
 		IO_NEXTREG_DAT = 0;
 }
 
-void sprites_hide()
+void sprites_hide(void)
 {
 	for (uint8_t i = 0; i < 32; i++)
 	{

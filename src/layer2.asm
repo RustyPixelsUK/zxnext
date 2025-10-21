@@ -111,16 +111,19 @@ _l2_tile_offset:
 
 IF USE_ASM_VERSION = 1
 
+IF DISABLE_VERT_SCROLL = 0
+
 PUBLIC _layer2_tile_get_offset
-PUBLIC _layer2_tilemap_update_column
 PUBLIC _layer2_tilemap_update_row
+PUBLIC _layer2_tilemap_scroll_up
+PUBLIC _layer2_tilemap_scroll_down
+ENDIF
+
+PUBLIC _layer2_tilemap_update_column
 PUBLIC _layer2_tilemap_update
 PUBLIC _layer2_tilemap_scroll_update
 PUBLIC _layer2_tilemap_scroll_left
 PUBLIC _layer2_tilemap_scroll_right
-PUBLIC _layer2_tilemap_scroll_up
-PUBLIC _layer2_tilemap_scroll_down
-
 EXTERN _layer2_tilemap_draw_tile
 EXTERN _layer2_tilemap_draw_column
 EXTERN _layer2_tilemap_draw_row
@@ -135,6 +138,7 @@ EXTERN _zxn_addr_from_mmu_fastcall
 ; ---------------------------------
 ; layer2_tile_get_offset
 ; ---------------------------------
+IF DISABLE_VERT_SCROLL = 0
 IF SCREEN_RES = RES_256x192
 _layer2_tile_get_offset_flip:
 ELIF SCREEN_RES = RES_320x256
@@ -267,6 +271,7 @@ layer2_tile_get_offset_rotate_y_mirror:
 	dec	a
 	ld	(_l2_tile_offset),a
 	ret
+ENDIF
 
 ; void layer2_tilemap_update_column()
 ; ---------------------------------
@@ -475,9 +480,11 @@ ENDIF
 	ld	l,a
 	call	_asm_bank_set_16k
 	; if (tile_y == TILE_Y)
+IF DISABLE_VERT_SCROLL = 0
 	ld	a,(_l2_tile_y)
 	sub	TILE_Y
 	jr	NZ,l_layer2_tilemap_update_column_00103
+ENDIF
 IF SCREEN_RES = RES_256x192
 	; screen_index_x = screen_x & 255;
 	ld	a,(_l2_screen_x)
@@ -535,6 +542,7 @@ ELIF SCREEN_RES = RES_320x256
 	ld	c,a
 	call	_layer2_tilemap_draw_column
 ENDIF
+IF DISABLE_VERT_SCROLL = 0
 	jr	l_layer2_tilemap_update_column_00110
 l_layer2_tilemap_update_column_00103:
 	; px = pixel_x;
@@ -605,6 +613,7 @@ ENDIF
 	inc	(hl)
 	jr	l_layer2_tilemap_update_column_00107
 l_layer2_tilemap_update_column_00110:
+ENDIF
 	; for (y = 0; y < SCREEN_TILES_Y + 1; y++)
 	ld	hl,_l2_screen_tile_y
 	inc	(hl)
@@ -618,6 +627,7 @@ l_layer2_tilemap_update_column_00110:
 ; ---------------------------------
 ; Function layer2_tilemap_update_row
 ; ---------------------------------
+IF DISABLE_VERT_SCROLL = 0
 _layer2_tilemap_update_row:
 	; pixel_x = (offset_x & 7);
 	ld	a,(_l2_offset_x)
@@ -981,6 +991,7 @@ l_layer2_tilemap_update_row_00110:
 	jp	C,l_layer2_tilemap_update_row_00109
 	; }
 	ret
+ENDIF
 
 ; void layer2_tilemap_update()
 ; ---------------------------------
@@ -1225,6 +1236,7 @@ ENDIF
 	ld	l,a
 	call	_asm_bank_set_16k
 	; if ((tile_x & tile_y) >> 3)
+IF DISABLE_VERT_SCROLL = 0
 	ld	a,(_l2_tile_x)
 	ld	hl,_l2_tile_y
 	and	(hl)
@@ -1233,6 +1245,7 @@ ENDIF
 	rrca
 	and	%00011111
 	jr	Z,l_layer2_tilemap_update_00104
+ENDIF
 IF SCREEN_RES = RES_256x192
 	; screen_index_x = screen_x & 255;
 	ld	a,(_l2_screen_x)
@@ -1270,6 +1283,7 @@ ENDIF
 	ld	a,(_l2_tile_attribs)
 	ld	b,a
 	call	_layer2_tilemap_draw_tile
+IF DISABLE_VERT_SCROLL = 0
 	jp	l_layer2_tilemap_update_00115
 l_layer2_tilemap_update_00104:
 	; for (py = 0; py < tile_y; py++)
@@ -1378,6 +1392,7 @@ l_layer2_tilemap_update_00113:
 	inc	(hl)
 	jr	l_layer2_tilemap_update_00112
 l_layer2_tilemap_update_00115:
+ENDIF
 	; for (x = 0; x < SCREEN_TILES_X + 1; x++)
 	ld	hl,_l2_screen_tile_x
 	ld	a,(hl)
@@ -1459,6 +1474,7 @@ _layer2_tilemap_scroll_right:
 _layer2_tilemap_scroll_right_end:
 	ret
 
+IF DISABLE_VERT_SCROLL = 0
 _layer2_tilemap_scroll_up:
 	ld	hl,(_l2_offset_y)
 	ld	a,h
@@ -1505,4 +1521,5 @@ _layer2_tilemap_scroll_down:
 _layer2_tilemap_scroll_down_end:
 	ret
 
+ENDIF
 ENDIF
