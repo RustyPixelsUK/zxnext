@@ -48,8 +48,8 @@ void sprite_set_attributes_rel(uint8_t sprite_index,
 								bool pattern_4bit);
 void sprite_set_palette(const uint16_t *colors, uint16_t length, uint8_t palette_index);
 void sprite_set_color(uint16_t color, uint8_t palette_index);
-void sprites_clear();
-void sprites_hide();
+void sprites_clear(void);
+void sprites_hide(void);
 void sprite_update(uint8_t i, uint8_t x, uint8_t y);
 
 #endif

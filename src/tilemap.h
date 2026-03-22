@@ -40,9 +40,9 @@
 #define TILE_BASE_OFF(n)                ((n - 0x4000) >> 8)
 #define MAP_BASE_OFF(n)                 ((n - 0x4000) >> 8)
 
-#define REG_CLIP_WINDOW_TILEMAP         0x1b
+//#define REG_CLIP_WINDOW_TILEMAP         0x1b
 
-#define REG_TILEMAP_TRANSPARENCY_INDEX  0x4c
+//#define REG_TILEMAP_TRANSPARENCY_INDEX  0x4c
 
 #define REG_TILEMAP_OFFSET_X_H          0x2f
 #define REG_TILEMAP_OFFSET_X_L          0x30
