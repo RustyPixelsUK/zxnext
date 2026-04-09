@@ -31,33 +31,32 @@ void sprite_set_pattern(uint8_t sprite_slot, const void *sprite_pattern, bool pa
 	}
 }
 
-void sprite_set_attributes_rel(uint8_t sprite_index,
-								uint8_t pattern_slot,
-								uint16_t x,
-								uint16_t y,
-								uint8_t palette_offset,
-								uint8_t sprite_flags,
-								bool visible,
-								bool anchor,
-								bool pattern_4bit)
+void sprite_set_attributes(uint8_t sprite_index,
+							uint8_t pattern_slot,
+							uint16_t x,
+							uint16_t y,
+							uint8_t scale_x,
+							uint8_t scale_y,
+							uint8_t palette_offset,
+							uint8_t sprite_flags)
 {
-	const uint8_t N = (pattern_4bit ? pattern_slot >> 1 : pattern_slot) & SPRITE_SLOT_MASK;
-	const uint8_t N6 = pattern_4bit ? pattern_slot & 1 : 0;
+	const uint8_t N = (sprite_flags & SPRITE_4BIT ? pattern_slot >> 1 : pattern_slot) & SPRITE_SLOT_MASK;
+	const uint8_t N6 = (sprite_flags & SPRITE_4BIT ? pattern_slot & 1 : 0);
 	
 	IO_SPRITE_SLOT = sprite_index;
 	IO_SPRITE_ATTRIBUTE = X_LSB(x);
-	IO_SPRITE_ATTRIBUTE = y;
-	IO_SPRITE_ATTRIBUTE = (palette_offset << PALETTE_OFFSET_SHIFT) | X_MSB(x) | sprite_flags;
-	IO_SPRITE_ATTRIBUTE = (visible ? SPRITE_VISIBLE : 0) | SPRITE_ENABLE_ATTRIB_4 | N;
+	IO_SPRITE_ATTRIBUTE = Y_LSB(y);
+	IO_SPRITE_ATTRIBUTE = (palette_offset << PALETTE_OFFSET_SHIFT) | X_MSB(x) | (sprite_flags & 0xF);
+	IO_SPRITE_ATTRIBUTE = (sprite_flags & SPRITE_VISIBLE) | SPRITE_ENABLE_ATTRIB_4 | N;
 
 	uint8_t attrib4 = 0;
 	
-	if (anchor)
+	if (sprite_flags & SPRITE_ANCHOR)
 	{
-		attrib4 |= (pattern_4bit ? (1 << 7) : 0); // 4-bit
+		attrib4 |= (SPRITE_4BIT << 1); // 4-bit
 		attrib4 |= (N6 << 6); // N6 pattern bit
 		attrib4 |= (1 << 5); // unified
-		attrib4 |= (y >> 8) & 1; // 9th bit of y coord
+		attrib4 |= Y_MSB(y); // 9th bit of y coord
 	}
 	else // unified
 	{
@@ -65,6 +64,9 @@ void sprite_set_attributes_rel(uint8_t sprite_index,
 		attrib4 |= (N6 << 5); // N6 pattern bit
 		attrib4 |= 1; // pattern number is relative to the anchor’s
 	}
+
+	attrib4 |= scale_x << 3; // magnification in the x direction
+	attrib4 |= scale_y << 1; // magnification in the y direction
 	
 	IO_SPRITE_ATTRIBUTE = attrib4;
 }
@@ -114,12 +116,12 @@ void sprites_hide(void)
 	for (uint8_t i = 0; i < 32; i++)
 	{
 		uint8_t sprite_index = i * 4;
-		sprite_set_attributes_rel(sprite_index, sprite_index, 0, 0, 0, 0, false, true, true);
+		sprite_set_attributes(sprite_index, sprite_index, 0, 0, 0, 0, 0, SPRITE_ANCHOR | SPRITE_4BIT);
 	}
 }
 
 void sprite_update(uint8_t i, uint8_t x, uint8_t y)
 {
 	uint8_t sprite_index = i * 4;
-	sprite_set_attributes_rel(sprite_index, sprite_index, x, y, 0, 0, true, true, true);
+	sprite_set_attributes(sprite_index, sprite_index, x, y, 0, 0, 0, SPRITE_VISIBLE | SPRITE_ANCHOR | SPRITE_4BIT);
 }

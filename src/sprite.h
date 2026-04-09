@@ -14,38 +14,46 @@
 #define X_LSB_MASK				0x00FF
 #define X_MSB_MASK				0x0100
 #define X_MSB_SHIFT				8
+#define Y_LSB_MASK				0x00FF
 #define Y_MSB_MASK				0x0100
 #define Y_MSB_SHIFT				8
 #define PALETTE_OFFSET_SHIFT	4
 #define SPRITE_ENABLE_ATTRIB_4	(1 << 6)
-#define SPRITE_VISIBLE			(1 << 7)
 
 #define SPRITE_RELATIVE_ANCHOR	(1 << 5)
 #define SPRITE_RELATIVE			(1 << 6)
 #define SPRITE_RELATIVE_4BIT	(1 << 7)
 
-#define MIRROR_X_MASK			(1 << 3)
-#define MIRROR_Y_MASK			(1 << 2)
-#define ROTATE_MASK				(1 << 1)
+#define SPRITE_SCALE_1X			0x00
+#define SPRITE_SCALE_2X			0x01
+#define SPRITE_SCALE_4X			0x10
+#define SPRITE_SCALE_8X			0x11
+
+#define SPRITE_VISIBLE			(1 << 7)
+#define SPRITE_4BIT				(1 << 6)
+#define SPRITE_ANCHOR			(1 << 4)
+#define SPRITE_MIRROR_X			(1 << 3)
+#define SPRITE_MIRROR_Y			(1 << 2)
+#define SPRITE_ROTATE			(1 << 1)
 
 #define X_LSB(x)				(uint8_t) ((x) & X_LSB_MASK)
 #define X_MSB(x)				(uint8_t) (((x) & X_MSB_MASK) >> X_MSB_SHIFT)
 #define X_EXT(x)				(((uint16_t) (x)) + 32)
+#define Y_LSB(x)				(uint8_t) ((y) & X_LSB_MASK)
 #define Y_EXT(y)				((y) + 32)
 #define Y_MSB(x)				(uint8_t) (((y) & Y_MSB_MASK) >> Y_MSB_SHIFT)
 
 void sprite_set_display_palette(bool first_palette);
 void sprite_set_rw_palette(bool first_palette);
 void sprite_set_pattern(uint8_t sprite_slot, const void *sprite_pattern, bool pattern_4bit);
-void sprite_set_attributes_rel(uint8_t sprite_index,
-								uint8_t pattern_slot,
-								uint16_t x,
-								uint16_t y,
-								uint8_t palette_offset,
-								uint8_t sprite_flags,
-								bool visible,
-								bool anchor,
-								bool pattern_4bit);
+void sprite_set_attributes(uint8_t sprite_index,
+							uint8_t pattern_slot,
+							uint16_t x,
+							uint16_t y,
+							uint8_t scale_x,
+							uint8_t scale_y,
+							uint8_t palette_offset,
+							uint8_t sprite_flags);
 void sprite_set_palette(const uint16_t *colors, uint16_t length, uint8_t palette_index);
 void sprite_set_color(uint16_t color, uint8_t palette_index);
 void sprites_clear(void);
