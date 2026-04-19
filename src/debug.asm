@@ -8,7 +8,7 @@ RASTER_LINE_MSB_REGISTER	= $1e
 RASTER_LINE_LSB_REGISTER	= $1f
 
 _breakpoint:
-	DEFB $dd, $01
+	DEFB $fd, $00
 	ret
 
 _wait_vblank:
