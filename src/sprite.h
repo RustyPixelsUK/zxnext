@@ -24,10 +24,10 @@
 #define SPRITE_RELATIVE			(1 << 6)
 #define SPRITE_RELATIVE_4BIT	(1 << 7)
 
-#define SPRITE_SCALE_1X			0x00
-#define SPRITE_SCALE_2X			0x01
-#define SPRITE_SCALE_4X			0x10
-#define SPRITE_SCALE_8X			0x11
+#define SPRITE_SCALE_1X			0
+#define SPRITE_SCALE_2X			1
+#define SPRITE_SCALE_4X			2
+#define SPRITE_SCALE_8X			3
 
 #define SPRITE_VISIBLE			(1 << 7)
 #define SPRITE_4BIT				(1 << 6)
