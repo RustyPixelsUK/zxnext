@@ -103,25 +103,28 @@ void sprite_set_color(uint16_t color, uint8_t palette_index)
 
 void sprites_clear(void)
 {
-	ZXN_NEXTREG(REG_SPRITE_SELECT, 0);
-	
-	IO_NEXTREG_REG = REG_SPRITE_ATTRIBUTES_INC;
-
-	for (unsigned int i = 0; i != 128; ++i)
-		IO_NEXTREG_DAT = 0;
+	for (uint8_t i = 0; i < 128; i++)
+	{
+		IO_SPRITE_SLOT = i;
+		IO_SPRITE_ATTRIBUTE = 0;
+		IO_SPRITE_ATTRIBUTE = 0;
+		IO_SPRITE_ATTRIBUTE = 0;
+		IO_SPRITE_ATTRIBUTE = 0;
+		IO_SPRITE_ATTRIBUTE = 0;
+	}
 }
 
 void sprites_hide(void)
 {
-	for (uint8_t i = 0; i < 32; i++)
+	for (uint8_t i = 0; i < 128; i++)
 	{
-		uint8_t sprite_index = i * 4;
+		uint8_t sprite_index = i << 2;
 		sprite_set_attributes(sprite_index, sprite_index, 0, 0, 0, 0, 0, SPRITE_ANCHOR | SPRITE_4BIT);
 	}
 }
 
 void sprite_update(uint8_t i, uint8_t x, uint8_t y)
 {
-	uint8_t sprite_index = i * 4;
+	uint8_t sprite_index = i << 2;
 	sprite_set_attributes(sprite_index, sprite_index, x, y, 0, 0, 0, SPRITE_VISIBLE | SPRITE_ANCHOR | SPRITE_4BIT);
 }
