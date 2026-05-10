@@ -1195,6 +1195,17 @@ T_PACK:
 	DEFB $0E10-$0D60
 	DEFB $0EF8-$0E10
 
+; module_0_vars sits at $5DC5 (= $6000-$23B), set by mmap.inc's
+; org directive at the project root. That address falls inside the
+; MMU2 region ($4000-$5FFF) which audio_zxn.c pages to the active
+; music bank (BANK_30 for hero1 / BANK_31 for hero2) around each
+; vt_init / vt_play call. So writes/reads at $5DC5 land on the
+; CURRENTLY-PAGED music bank's RAM at offset $1DC5 -- giving each
+; chip its OWN independent vars (MDLADDR, channel state, etc.)
+; that bank-swap automatically with the music bank. This is the
+; mechanism that lets the dual-AY player drive two unrelated PT3
+; modules from a single PT3PROM instance: state isolation comes
+; from MMU paging, not from the player having multiple state sets.
 SECTION module_0_vars
 
 ;vars from here can be stripped
@@ -1299,6 +1310,11 @@ DEFC VARSEND = ASMPC
 
 DEFC MDLADDR = ASMPC
 
+; module_1_vars at $7DC5 (= $8000-$23B), placeholder reservation
+; from the demo's layout. PT3PROM only uses module_0_vars labels;
+; this section just reserves the equivalent address space in MMU3
+; ($6000-$7FFF) so no other code/data lands there in any bank
+; that gets paged at MMU_4000 during music play.
 SECTION module_1_vars
 	DEFS $23B,$00
 

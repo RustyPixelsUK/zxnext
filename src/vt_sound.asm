@@ -38,7 +38,39 @@ _vt_init:
     ei
     ret
 
-DEFC _vt_play = VT_PLAY
+; Was: DEFC _vt_play = VT_PLAY  (bare alias). PT3PROM's VT_PLAY clobbers
+; IX, IY and the alternate register set, but SDCC C callers expect those
+; preserved across function calls -- result was a hang the moment the
+; first per-frame vt_play() returned with garbage in IY/EXX state. Now
+; we wrap it with a full save/restore (mirrors _vt_play_isr but without
+; di/ei/reti since the C wrapper handles interrupts itself).
+_vt_play:
+    push af
+    push bc
+    push de
+    push hl
+    push ix
+    push iy
+    ex af,af'
+    exx
+    push af
+    push bc
+    push de
+    push hl
+    call VT_PLAY
+    pop hl
+    pop de
+    pop bc
+    pop af
+    exx
+    ex af,af'
+    pop iy
+    pop ix
+    pop hl
+    pop de
+    pop bc
+    pop af
+    ret
 
 _vt_play_isr:
     di
