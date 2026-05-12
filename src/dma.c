@@ -61,7 +61,17 @@ typedef struct
 	uint8_t enable;
 } dma_code_sample_t;
 
-dma_code_t dma_code_transfer =
+typedef struct
+{
+	uint8_t  wr0;
+	void *source;
+	uint8_t wr4;
+	void *dest;
+	uint8_t load;
+	uint8_t enable;
+} dma_code_microburst_t;
+
+static dma_code_t dma_code_transfer =
 {
 	.disable = D_DISABLE_DMA,
 	.reset_dma = 0xc3,											// r6-reset dma
@@ -79,7 +89,7 @@ dma_code_t dma_code_transfer =
 	.enable = D_ENABLE_DMA
 };
 
-dma_code_t dma_code_transfer_reversed =
+static dma_code_t dma_code_transfer_reversed =
 {
 	.disable = D_DISABLE_DMA,
 	.reset_dma = 0xc3,											// r6-reset dma
@@ -97,7 +107,7 @@ dma_code_t dma_code_transfer_reversed =
 	.enable = D_ENABLE_DMA
 };
 
-dma_code_t dma_code_transfer_io =
+static dma_code_t dma_code_transfer_io =
 {
 	.disable = D_DISABLE_DMA,
 	.reset_dma = 0xc3,											// r6-reset dma
@@ -115,7 +125,7 @@ dma_code_t dma_code_transfer_io =
 	.enable = D_ENABLE_DMA
 };
 
-dma_code_fill_t dma_code_fill =
+static dma_code_fill_t dma_code_fill =
 {
 	.fill_value = 0,
 	.disable = D_DISABLE_DMA,
@@ -131,7 +141,7 @@ dma_code_fill_t dma_code_fill =
 	.enable = D_ENABLE_DMA
 };
 
-dma_code_sample_t dma_code_sample_io =
+static dma_code_sample_t dma_code_sample_io =
 {
 	.disable_dma = D_DISABLE_DMA,								// r6-disable dma
 	.reset_dma = 0xc3,											// r6-reset dma
@@ -153,6 +163,16 @@ dma_code_sample_t dma_code_sample_io =
 	.load = D_LOAD,												// r6-load
 	.force = 0xb3,												// r6-force ready
 	.enable = D_ENABLE_DMA										// r6-enable dma
+};
+
+static dma_code_microburst_t dma_code_microburst =
+{
+	.wr0    = D_WR0 | D_WR0_TRANSFER_A_TO_B | D_WR0_X34_A_START,
+	.source = 0,
+	.wr4    = 0x80 | D_WR4_X23_B_START | D_WR4_CONT | 0x01,
+	.dest   = 0,
+	.load   = D_LOAD,
+	.enable = D_ENABLE_DMA,
 };
 
 void dma_transfer(void *dest, void *source, uint16_t length)
@@ -208,6 +228,24 @@ void dma_fill(void *dest, uint8_t fill_value, uint16_t length)
 	dma_code_fill.source = &dma_code_fill.fill_value;
 	dma_code_fill.length = length;
 	dma_code_fill.dest = dest;
-	
+
 	z80_otir(&dma_code_fill, IO_DMA_PORT, sizeof(dma_code_fill));
+}
+
+
+void dma_transfer_lines(void *dest, void *source, uint16_t length, uint16_t src_stride, uint16_t dst_stride, uint8_t lines)
+{
+	dma_code_transfer.source = source;
+	dma_code_transfer.length = length;
+	dma_code_transfer.dest   = dest;
+	z80_otir(&dma_code_transfer, IO_DMA_PORT, sizeof(dma_code_transfer));
+
+	while (--lines)
+	{
+		source = (uint8_t *)source + src_stride;
+		dest   = (uint8_t *)dest   + dst_stride;
+		dma_code_microburst.source = source;
+		dma_code_microburst.dest   = dest;
+		z80_otir(&dma_code_microburst, IO_DMA_PORT, sizeof(dma_code_microburst));
+	}
 }

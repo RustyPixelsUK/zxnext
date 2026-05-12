@@ -18,5 +18,6 @@ void dma_transfer_port(void *source, uint16_t length);
 void dma_transfer_sprite(void *source, uint16_t length);
 void dma_transfer_sample(void *source, uint16_t length, uint8_t scaler, bool loop);
 void dma_fill(void *dest, uint8_t fill_value, uint16_t length);
+void dma_transfer_lines(void *dest, void *source, uint16_t length, uint16_t src_stride, uint16_t dst_stride, uint8_t lines);
 
 #endif
