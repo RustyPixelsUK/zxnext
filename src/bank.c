@@ -9,13 +9,6 @@ uint8_t bank_set_8k(uint8_t mmu, uint8_t page)
 	return old_page >> 1;
 }
 
-uint8_t bank_set_8k_raw(uint8_t mmu, uint8_t page)
-{
-	uint8_t old_page = ZXN_READ_REG(REG_MMU0 + mmu);
-	ZXN_WRITE_REG(REG_MMU0 + mmu, page);
-	return old_page;
-}
-
 uint8_t bank_set_16k(uint8_t mmu, uint8_t page)
 {
 	uint8_t old_page = ZXN_READ_REG(REG_MMU0 + mmu);
